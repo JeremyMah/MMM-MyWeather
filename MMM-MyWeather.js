@@ -304,11 +304,6 @@ Module.register("MMM-MyWeather", {
     // Forecast table
     if (this.config.forecasttable === 1) {
 
-      var header = document.createElement("header");
-      header.classList.add("module-header");
-      header.innerHTML = this.config.forecasttableheadertext;
-      wrapper.appendChild(header);
-
 
       var table = document.createElement("table");
       table.className = "small";
@@ -413,13 +408,12 @@ Module.register("MMM-MyWeather", {
             iconCell.appendChild(icon);
 
             maxTempCell = document.createElement("td");
+	    maxTempCell.setAttribute("colSpan", "2");
             maxTempCell.innerHTML = forecast.maxTemp + "&deg;";
-            maxTempCell.className = "align-right hourly-temp";
+            maxTempCell.className = "align-center hourly-temp";
             row.appendChild(maxTempCell);
 
-            minTempCell = document.createElement("td");
-            minTempCell.innerHTML = "&nbsp;";
-            row.appendChild(minTempCell);
+           
 
             popCell = document.createElement("td");
             popCell.innerHTML = forecast.pop + "%";

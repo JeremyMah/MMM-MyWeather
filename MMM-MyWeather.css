@@ -67,6 +67,10 @@
   color: #FF4C4C;
 }
 
+.MMM-MyWeather .align-center {
+	text-align: center;
+}
+
 .MMM-MyWeather .center {
 	text-align: center;
 	padding-right: 10px; 
