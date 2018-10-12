@@ -11,7 +11,7 @@
 }
 
 .MMM-MyWeather table tr {
-  border-bottom: solid 1px #222;
+  #border-bottom: solid 1px #222;
 }
 
 .MMM-MyWeather .weathericon {
