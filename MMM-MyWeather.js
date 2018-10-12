@@ -25,7 +25,7 @@ Module.register("MMM-MyWeather", {
     forecasttablecolumnheadericons: 1,
     coloricon: false,
     units: config.units,
-    windunits: "bft", // choose from mph, bft
+    windunits: "bft", // choose from mph, kph, bft
     updateInterval: 10 * 60 * 1000, // every 10 minutes
     animationSpeed: 1000,
     timeFormat: "h a",
@@ -52,6 +52,7 @@ Module.register("MMM-MyWeather", {
 		socknot: "GET_WUNDERGROUND",
 		sockrcv: "WUNDERGROUND",
     enableCompliments: 0,
+    itemsPerRow: 4,
 
     retryDelay: 2500,
 
@@ -237,7 +238,9 @@ Module.register("MMM-MyWeather", {
 
         var windIcon = document.createElement("td");
         if (this.config.windunits == "mph") {
-          windIcon.innerHTML = this.windSpeedMph + "<sub>mph</sub>";
+          windIcon.innerHTML = this.windSpeedMph + " mph";
+        } else if (this.config.windunits == "kph") {
+          windIcon.innerHTML = this.windSpeedKph + " km/h";
         } else {
           windIcon.className = "wi " + this.windSpeed;
         }
@@ -307,7 +310,7 @@ Module.register("MMM-MyWeather", {
 
       var table = document.createElement("table");
       table.className = "small";
-      table.setAttribute("width", "25%");
+      // table.setAttribute("width", "25%");
 
 
       if (this.config.layout == "vertical") {
@@ -372,8 +375,12 @@ Module.register("MMM-MyWeather", {
         }
 
         if (this.config.hourly == 1) {
-          for (f in this.forecast) {
-            forecast = this.hourlyforecast[f * this.config.hourlyinterval];
+          // for (f in this.forecast) {
+            // forecast = this.hourlyforecast[f * this.config.hourlyinterval];
+
+          var counter = 0;
+          for (var i = Number(this.config.hourlyinterval) - 1; i < this.hourlyforecast.length; i += Number(this.config.hourlyinterval)) {
+            forecast = this.hourlyforecast[i];
 
             row = document.createElement("tr");
             table.appendChild(row);
@@ -425,7 +432,8 @@ Module.register("MMM-MyWeather", {
             mmCell.className = "align-right mm";
             row.appendChild(mmCell);
 
-            if (f > this.config.hourlycount) {
+            counter = counter + 1;
+            if (counter == Number(this.config.hourlycount)) {
               break;
             }
     	
@@ -514,27 +522,27 @@ Module.register("MMM-MyWeather", {
 
 
         var fctable = document.createElement("div");
-        var divider = document.createElement("hr");
-        divider.className = "hrDivider";
+        // var divider = document.createElement("hr");
+        // divider.className = "hrDivider";
         // fctable.appendChild(divider);
 
         if (this.config.fctext == 1) {
-            var row = document.createElement("tr");
-            var forecastTextCell = document.createElement("td");
+            // var row = document.createElement("tr");
+            var forecastTextCell = document.createElement("div");
 
             forecastTextCell.className = "forecastText";
-            forecastTextCell.setAttribute("colSpan", "10");
+            // forecastTextCell.setAttribute("colSpan", "10");
             forecastTextCell.innerHTML = this.forecastText;
 
-            row.appendChild(forecastTextCell);
-            table.appendChild(row);
-            fctable.appendChild(table);
-            fctable.appendChild(divider.cloneNode(true));
+            fctable.appendChild(forecastTextCell);
+            // table.appendChild(row);
+            // fctable.appendChild(table);
+            // fctable.appendChild(divider.cloneNode(true));
         }
 
         table = document.createElement("table");
         table.className = "small";
-        table.setAttribute("width", "25%");
+        // table.setAttribute("width", "25%");
         table.classList.add("horizontal");
 
         if (this.config.sysstat == 1) {
@@ -621,7 +629,7 @@ Module.register("MMM-MyWeather", {
 
           table = document.createElement("table");
           table.className = "small";
-          table.setAttribute("width", "25%");
+          // table.setAttribute("width", "25%");
 
         }
 
@@ -633,8 +641,13 @@ Module.register("MMM-MyWeather", {
           row_pop = document.createElement("tr");
           row_wind = document.createElement("tr");
 
-          for (f in this.forecast) {
-            forecast = this.hourlyforecast[f * this.config.hourlyinterval];
+
+          // for (f in this.forecast) {
+          //   forecast = this.hourlyforecast[f * Number(this.config.hourlyinterval)];
+
+          var counter = 0;
+          for (var i = Number(this.config.hourlyinterval) - 1; i < this.hourlyforecast.length; i += Number(this.config.hourlyinterval)) {
+            forecast = this.hourlyforecast[i];
 
             hourCell = document.createElement("td");
             hourCell.className = "hour";
@@ -673,26 +686,34 @@ Module.register("MMM-MyWeather", {
             var windDirectionIcon = document.createElement("td");
             windDirectionIcon.className = "center";
 
-            windDirectionIconCell = document.createElement("i");
+            windDirectionIconCell = document.createElement("span");
             if (this.config.windunits == "mph") {
-              windDirectionIconCell.innerHTML = forecast.windSpdMph + "<sub>mph</sub>";
+              windDirectionIconCell.innerHTML = forecast.windSpdMph + " mph";
+            } else if (this.config.windunits == "kph") {
+              windDirectionIconCell.innerHTML = forecast.windSpdKph + " km/h";
             } else {
               windDirectionIconCell.className = "wi " + forecast.windSpd;
             }
             windDirectionIcon.appendChild(windDirectionIconCell);
 
-            var spacer = document.createElement("i");
-            spacer.innerHTML = "&nbsp;&nbsp;";
-            windDirectionIcon.appendChild(spacer);
+            // var spacer = document.createElement("");
+            // spacer.innerHTML = "&nbsp;&nbsp;";
+            // windDirectionIcon.appendChild(spacer);
 
 
-            windDirectionIconCell = document.createElement("i");
+            windDirectionIconCell = document.createElement("span");
+
 
             if (this.config.UseCardinals === 0) {
-              windDirectionIconCell.className = "wi wi-wind " + forecast.windDir;
+
+              windDirectionIconCell.classList.add("icon-container");
+              var windDirectionIconGlyph = document.createElement("span");
+              windDirectionIconGlyph.className = "wi wi-wind " + forecast.windDir;
+              windDirectionIconCell.appendChild(windDirectionIconGlyph);
+
             } else {
-              windDirectionIconCell.className = "smaller";
-              windDirectionIconCell.innerHTML = this.windDirImp;
+              // windDirectionIconCell.className = "smaller";
+              windDirectionIconCell.innerHTML = "&nbsp;" + forecast.windDirImp;
             }
             windDirectionIcon.appendChild(windDirectionIconCell);
 
@@ -701,8 +722,20 @@ Module.register("MMM-MyWeather", {
 
 
 
-            var nl = Number(f) + 1;
-            if ((nl % 4) === 0) {
+            counter = counter + 1;
+ 
+            if (counter == Number(this.config.hourlycount)) {
+              table.appendChild(row_time);
+              table.appendChild(row_icon);
+              table.appendChild(row_temp);
+              table.appendChild(row_pop);
+              table.appendChild(row_wind);
+              fctable.appendChild(table);
+              // fctable.appendChild(divider.cloneNode(true));
+              break;
+
+            } else if (counter % this.config.itemsPerRow === 0) {
+
               table.appendChild(row_time);
               table.appendChild(row_icon);
               table.appendChild(row_temp);
@@ -715,25 +748,16 @@ Module.register("MMM-MyWeather", {
               row_wind = document.createElement("tr");
             }
 
-            if (f > this.config.hourlycount) {
-              break;
-            }
+
           }
 
 
-          table.appendChild(row_time);
-          table.appendChild(row_icon);
-          table.appendChild(row_temp);
-          table.appendChild(row_pop);
-          table.appendChild(row_wind);
-          fctable.appendChild(table);
-          // fctable.appendChild(divider.cloneNode(true));
 
         }
 
         table = document.createElement("table");
         table.className = "small";
-        table.setAttribute("width", "25%");
+        // table.setAttribute("width", "25%");
         table.classList.add("horizontal");
 
 
@@ -743,7 +767,11 @@ Module.register("MMM-MyWeather", {
         row_pop = document.createElement("tr");
         row_wind = document.createElement("tr");
 
+
     		if (this.config.daily == 1) {
+
+          counter = 0;
+
     			for (f in this.forecast) {
     				forecast = this.forecast[f];
 
@@ -783,51 +811,58 @@ Module.register("MMM-MyWeather", {
 
     				windDirectionIcon = document.createElement("td");
     				windDirectionIcon.className = "center";
-    				windDirectionIconCell = document.createElement("i");
+    				windDirectionIconCell = document.createElement("span");
     				if (this.config.windunits == "mph") {
-    					windDirectionIconCell.innerHTML = forecast.windSpdMph + "<sub>mph</sub>";
-    				} else {
+    					windDirectionIconCell.innerHTML = forecast.windSpdMph + " mph";
+    				} else if (this.config.windunits == "kph") {
+              windDirectionIconCell.innerHTML = forecast.windSpdKph + " km/h";
+            } else {
     					windDirectionIconCell.className = "wi " + forecast.windSpd;
     				}
     				windDirectionIcon.appendChild(windDirectionIconCell);
 
-    				spacer = document.createElement("i");
-    				spacer.innerHTML = "&nbsp;&nbsp;";
-    				windDirectionIcon.appendChild(spacer);
+    				// spacer = document.createElement("i");
+    				// spacer.innerHTML = "&nbsp;&nbsp;";
+    				// windDirectionIcon.appendChild(spacer);
 
-    				windDirectionIconCell = document.createElement("i");
+    				windDirectionIconCell = document.createElement("span");
 
-    				if (this.config.UseCardinals === 0) {
-    					windDirectionIconCell.className = "wi wi-wind " + forecast.windDir;
+            if (this.config.UseCardinals === 0) {
+              windDirectionIconCell.classList.add("icon-container");
+              var windDirectionIconGlyph = document.createElement("span");
+    					windDirectionIconGlyph.className = "wi wi-wind " + forecast.windDir;
+              windDirectionIconCell.appendChild(windDirectionIconGlyph);
     				} else {
-    					windDirectionIconCell.className = "smaller";
-    					windDirectionIconCell.innerHTML = this.windDirImp;
+    					// windDirectionIconCell.className = "smaller";
+    					windDirectionIconCell.innerHTML = "&nbsp;" + forecast.windDirImp;
     				}
     				windDirectionIcon.appendChild(windDirectionIconCell);
 
     				row_wind.appendChild(windDirectionIcon);
 
-    				var nl = Number(f) + 1;
-    				if ((nl % 4) === 0) {
-    					table.appendChild(row_time);
-    					table.appendChild(row_icon);
-    					table.appendChild(row_temp);
-    					table.appendChild(row_pop);
-    					table.appendChild(row_wind);
-    					row_time = document.createElement("tr");
-    					row_icon = document.createElement("tr");
-    					row_temp = document.createElement("tr");
-    					row_pop = document.createElement("tr");
-    					row_wind = document.createElement("tr");
-    				}
+    				counter = counter + 1;
+            if (counter == this.config.fcdaycount) {
+        			table.appendChild(row_time);
+        			table.appendChild(row_icon);
+        			table.appendChild(row_temp);
+        			table.appendChild(row_pop);
+        			table.appendChild(row_wind);
+              break;
+            } else if (counter % this.config.itemsPerRow === 0) {
+              table.appendChild(row_time);
+              table.appendChild(row_icon);
+              table.appendChild(row_temp);
+              table.appendChild(row_pop);
+              table.appendChild(row_wind);
+              row_time = document.createElement("tr");
+              row_icon = document.createElement("tr");
+              row_temp = document.createElement("tr");
+              row_pop = document.createElement("tr");
+              row_wind = document.createElement("tr");
+            }
 
-    			}
+          }
 
-    			table.appendChild(row_time);
-    			table.appendChild(row_icon);
-    			table.appendChild(row_temp);
-    			table.appendChild(row_pop);
-    			table.appendChild(row_wind);
     			fctable.appendChild(table);
     			wrapper.appendChild(fctable);
     		}
@@ -974,6 +1009,7 @@ Module.register("MMM-MyWeather", {
       this.Humidity = data.current_observation.relative_humidity;
       this.Humidity = this.Humidity.substring(0, this.Humidity.length - 1);
       this.windSpeed = "wi-wind-beaufort-" + this.ms2Beaufort(data.current_observation.wind_kph);
+      this.windSpeedKph = data.current_observation.wind_kph;
       this.windSpeedMph = data.current_observation.wind_mph;
       this.moonPhaseIcon = "<img class='moonPhaseIcon' src='https://www.wunderground.com/graphics/moonpictsnew/moon" + data.moon_phase.ageOfMoon + ".gif'>";
 
@@ -998,8 +1034,9 @@ Module.register("MMM-MyWeather", {
           fc_wrap = Math.round(fc_wrap * (100 / fc_scale));
         }
       }
-      this.forecastText = '<div style="font-size:' + fc_scale + '%">';
-      this.forecastText = this.forecastText + this.wordwrap(fc_text, fc_wrap, "<BR>");
+      // this.forecastText = '<div style="font-size:' + fc_scale + '%">';
+      // this.forecastText = this.forecastText + this.wordwrap(fc_text, fc_wrap, "<BR>");
+      this.forecastText = fc_text;
       // console.log("Wrap: " + fc_wrap + " Scale: " + fc_scale + " Lines: " + fc_lines + " Length: " + fc_text.length);
 
       this.temperature = this.roundValue(this.temperature);
@@ -1013,7 +1050,7 @@ Module.register("MMM-MyWeather", {
 
 
       this.forecast = [];
-      for (i = this.config.fcdaystart, count = data.forecast.simpleforecast.forecastday.length; i < this.config.fcdaycount; i++) {
+      for (i = this.config.fcdaystart, count = data.forecast.simpleforecast.forecastday.length; i < Number(this.config.fcdaycount) + 1; i++) {
 
         forecast = data.forecast.simpleforecast.forecastday[i];
 
@@ -1041,6 +1078,7 @@ Module.register("MMM-MyWeather", {
         this.windDir = this.deg2Cardinal(forecast.maxwind.degrees);
         this.windDirImp = forecast.maxwind.dir;
         this.windSpd = "wi-wind-beaufort-" + this.ms2Beaufort(forecast.maxwind.kph);
+        this.windSpdKph = forecast.maxwind.kph;
         this.windSpdMph = forecast.maxwind.mph;
 
         this.icon_url = "<img style='max-height:100%; max-width:100%; vertical-align:middle' src='./modules/MMM-MyWeather/img/" + this.config.iconset + "/" +
@@ -1056,6 +1094,7 @@ Module.register("MMM-MyWeather", {
           windDir: this.windDir,
           windDirImp: this.windDirImp,
           windSpd: this.windSpd,
+          windSpdKph: this.windSpdKph,
           windSpdMph: this.windSpdMph,
           mm: this.tmm
         });
@@ -1066,24 +1105,26 @@ Module.register("MMM-MyWeather", {
         this.hourlyforecast = [];
         for (i = 0, count = data.hourly_forecast.length; i < count; i++) {
 
+        // count = 0;
+        // for (i = this.config.hourlyinterval, i < data.hourly_forecast.length; i = i + this.config.hourlyinterval) {
           var hourlyforecast = data.hourly_forecast[i];
 
           if (this.config.units == "metric") {
             this.tmaxTemp = hourlyforecast.temp.metric;
             this.tminTemp = hourlyforecast.feelslike.metric;
             if (Number(forecast.snow_allday.cm) > 0) {
-              this.tmm = forecast.snow_allday.cm + "cm";
+              this.tmm = hourlyforecast.snow.metric + "cm";
             } else {
-              this.tmm = forecast.qpf_allday.mm + "mm";
+              this.tmm = hourlyforecast.qpf.metric + "mm";
             }
             this.thour = hourlyforecast.FCTTIME.hour + ":00";
           } else {
             this.tmaxTemp = hourlyforecast.temp.english;
             this.tminTemp = hourlyforecast.feelslike.english;
             if (Number(forecast.snow_allday.in) > 0) {
-              this.tmm = forecast.snow_allday.in + "in";
+              this.tmm = hourlyforecast.snow.english + "in";
             } else {
-              this.tmm = forecast.qpf_allday.in + "in";
+              this.tmm = hourlyforecast.qpf.english + "in";
             }
             this.thour = hourlyforecast.FCTTIME.hour + ":00";
           }
@@ -1098,6 +1139,7 @@ Module.register("MMM-MyWeather", {
           this.windDir = this.deg2Cardinal(hourlyforecast.wdir.degrees);
           this.windDirImp = hourlyforecast.wdir.dir;
           this.windSpd = "wi-wind-beaufort-" + this.ms2Beaufort(hourlyforecast.wspd.metric);
+          this.windSpdKph = hourlyforecast.wspd.metric;
           this.windSpdMph = hourlyforecast.wspd.english;
 
 
@@ -1111,6 +1153,7 @@ Module.register("MMM-MyWeather", {
             windDir: this.windDir,
             windDirImp: this.windDirImp,
             windSpd: this.windSpd,
+            windSpdKph: this.windSpdKph,
             windSpdMph: this.windSpdMph,
             mm: this.tmm
           });
